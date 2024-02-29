@@ -37,7 +37,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   os_disk {
     disk_size_gb         = 32
     caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = "Standard_LRS"
   }
 # Espeficificamos la imagen origen que se utilizará para crear la maquina
   source_image_reference {
@@ -59,8 +59,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name            = "default"
     node_count      = 1
-    vm_size         = "Basic_A1"
-    os_disk_size_gb = 10
+    vm_size         = "Standard_DS2_v2"
+    os_disk_size_gb = 30
   }
   service_principal {
     client_id     = var.client_id
@@ -70,6 +70,4 @@ resource "azurerm_kubernetes_cluster" "aks" {
     Environment = "Production"
   }
 }
-
-
 
