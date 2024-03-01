@@ -37,3 +37,21 @@ variable "client_id" {
 variable "client_secret" {
   description = "Secreto del cliente del servicio principal de Azure"
 }
+
+variable "vnet_name" {
+  description = "Nombre de la red virtual"
+}
+
+variable "subnet_name" {
+  description = "Nombre de la subred"
+}
+
+variable "nic_name" {
+  description = "Nombre de la interfaz de red"
+}
+
+variable "ip_pub" {
+  description = "Nombre de la ip pública"
+}
+
+
