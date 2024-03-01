@@ -36,8 +36,8 @@ resource "azurerm_public_ip" "public_ip" {
   name                = var.ip_pub
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"  # Puedes cambiar a "Static" si necesitas una IP pública estática
-}
+  allocation_method   = "Dynamic"  
+
 # Creación de una interfaz de red
 resource "azurerm_network_interface" "interface" {
   name                = var.nic_name
@@ -82,7 +82,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 }
 
-# Recurso de Azure Kubernetes Service (AKS)
+# Creamos el Azure Kubernetes Service (AKS)
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.aks_cluster_name
   location            = azurerm_resource_group.rg.location
