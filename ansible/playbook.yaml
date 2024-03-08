@@ -1,0 +1,48 @@
+- name: Configurar la infra
+  hosts: localhost
+  remote_user: ruben
+  become: true
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Descargar imagen de nginx con Podman
+      containers.podman.podman_image:
+        name: "{{ app1 }}"
+        pull: yes
+
+    - name: Descargar imagen de la app con Podman
+      containers.podman.podman_image:
+        name: "{{ app2 }}"
+        pull: yes
+
+    - name: Descargar imagen de la app con Podman
+      containers.podman.podman_image:
+        name: "{{ app3 }}"
+        pull: yes
+
+    - name: Push de la imagen de nginx hacia nuestro acr
+      containers.podman.podman_image:
+        name: "{{ image_name1 }}"
+        push: true
+        username: "{{ acr_username }}"
+        password: "{{ acr_password }}"
+        push_args:
+         dest: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name1 }}"
+
+    - name: Push de la imagen de la app hacia nuestro acr
+      containers.podman.podman_image:
+        name: "{{ image_name2 }}"
+        push: true
+        username: "{{ acr_username }}"
+        password: "{{ acr_password }}"
+        push_args:
+         dest: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name2 }}"
+
+    - name: Push de la imagen de la app hacia nuestro acr
+      containers.podman.podman_image:
+        name: "{{ image_name3 }}"
+        push: true
+        username: "{{ acr_username }}"
+        password: "{{ acr_password }}"
+        push_args:
+         dest: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name3 }}"
