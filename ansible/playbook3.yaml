@@ -1,0 +1,23 @@
+- name: Desplegar aplicación en AKS con Podman
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+   - vars.yaml
+  tasks:
+    - name: Descargar imagen de la aplicación desde el registro privado
+      containers.podman.podman_image:
+        name: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name1 }}"
+        pull: yes
+        username: "{{ acr_username }}"
+        password: "{{ acr_password }}"
+
+    - name: Desplegar la aplicación en AKS
+      k8s:
+        state: present
+        definition: ruta_al_archivo_de_despliegue.yaml
+
+    - name: Exponer la aplicación a Internet
+      k8s_service:
+        state: present
+        definition: ruta_al_archivo_de_servicio.yaml
+
