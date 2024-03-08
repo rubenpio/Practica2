@@ -16,6 +16,44 @@ resource "azurerm_container_registry" "acr" {
   location                 = azurerm_resource_group.rg.location
   sku                      = "Basic"
 }
+
+# Recurso de Azure Kubernetes Service (AKS)
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = var.aks_cluster_name
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  dns_prefix          = var.aks_dns_prefix
+
+  default_node_pool {
+    name            = "default"
+    node_count      = 1
+    vm_size         = "Standard_DS2_v2"
+    os_disk_size_gb = 30
+  }
+  identity {
+    type = "SystemAssigned"
+  }
+#  service_principal {
+#    client_id     = var.client_id
+#    client_secret = var.client_secret
+#  }
+  tags = {
+    Environment = "Production"
+  }
+  network_profile {
+    load_balancer_sku = "standard"
+    network_plugin    = "kubenet"
+  }
+}
+
+# Asignación de roles para permitir que AKS acceda a ACR
+resource "azurerm_role_assignment" "aks_acr_role_assignment" {
+  scope                = azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity.0.object_id
+  skip_service_principal_aad_check= true
+}
+
 # Creación de la red virtual
 resource "azurerm_virtual_network" "vnet" {
   name                = var.vnet_name
@@ -36,8 +74,8 @@ resource "azurerm_public_ip" "public_ip" {
   name                = var.ip_pub
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"  
-
+  allocation_method   = "Dynamic"  # Puedes cambiar a "Static" si necesitas una IP pública estática
+}
 # Creación de una interfaz de red
 resource "azurerm_network_interface" "interface" {
   name                = var.nic_name
@@ -76,33 +114,11 @@ resource "azurerm_linux_virtual_machine" "vm" {
 # Espeficificamos la imagen origen que se utilizará para crear la maquina
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
     version   = "latest"
-  }
 }
 
-# Creamos el Azure Kubernetes Service (AKS)
-resource "azurerm_kubernetes_cluster" "aks" {
-  name                = var.aks_cluster_name
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = var.aks_dns_prefix
-
-
-  default_node_pool {
-    name            = "default"
-    node_count      = 1
-    vm_size         = "Standard_DS2_v2"
-    os_disk_size_gb = 30
-  }
-  service_principal {
-    client_id     = var.client_id
-    client_secret = var.client_secret
-  }
-  tags = {
-    Environment = "Production"
-  }
-
+}
 
 
