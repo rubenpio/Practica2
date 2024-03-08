@@ -1,0 +1,59 @@
+- name: Copiar archivos y ejecutar contenedor
+  hosts: Mi_Maquina
+  become: yes
+  remote_user: adminuser
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Actualizar la lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar paquetes necesarios para Podman
+      apt:
+        name: ["software-properties-common", "apt-transport-https", "gnupg"]
+
+    - name: Agregar la clave GPG de Podman
+      apt_key:
+        url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_22.04/Release.key"
+        state: present
+
+    - name: Agregar el repositorio de Podman
+      apt_repository:
+        repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_22.04/ /"
+        state: present
+
+    - name: Actualizar la lista de paquetes después de agregar el repositorio de Podman
+      apt:
+        update_cache: yes
+
+    - name: Instalar Podman
+      apt:
+        name: podman
+        state: present
+    - name: Copiar archivo de autenticación básica (htpasswd)
+      copy:
+        src: nginx/.htpasswd
+        dest: /home/adminuser/.htpasswd
+        mode: 0777
+
+    - name: Copiar archivo de config
+      copy:
+        src: nginx/default
+        dest: /home/adminuser/default
+        mode: 0777
+
+    - name: Nos traemos la imagen de nginx
+      containers.podman.podman_image:
+        name: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name1 }}"
+        pull: yes
+        username: "{{ acr_username }}"
+        password: "{{ acr_password }}"
+
+    - name: Run container
+      containers.podman.podman_container:
+        name: Mi_Contenedor
+        image: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name1 }}"
+        state: started
+        ports:
+          - "8080:80"
