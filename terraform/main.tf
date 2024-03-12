@@ -33,10 +33,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
   identity {
     type = "SystemAssigned"
   }
-#  service_principal {
-#    client_id     = var.client_id
-#    client_secret = var.client_secret
-#  }
   tags = {
     Environment = "Production"
   }
@@ -117,8 +113,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts-gen2"
     version   = "latest"
-}
+  }
 
 }
-
-
