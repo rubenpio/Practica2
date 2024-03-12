@@ -1,0 +1,9 @@
+[servers]
+Mi_Maquina ansible_host=172.201.207.245
+
+[servers:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+
+
+
