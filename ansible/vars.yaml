@@ -1,9 +1,10 @@
-image_name1: nginx
-image_name2: azure-vote-front:v1
+image_name1: wordpress
+image_name2: httpd
 image_name3: redis:6.0.8
 acr_name: acrruben
 acr_username: ACRRuben
 acr_password: 
-app1: docker://nginx
-app2: docker://mcr.microsoft.com/azuredocs/azure-vote-front:v1
+app1: docker://wordpress
+app2: docker://httpd
 app3: docker://mcr.microsoft.com/oss/bitnami/redis:6.0.8
+label: CasoPractico2
