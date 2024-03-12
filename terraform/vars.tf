@@ -30,14 +30,6 @@ variable "aks_dns_prefix" {
   description = "Prefijo DNS para el clúster de AKS"
 }
 
-variable "client_id" {
-  description = "ID de cliente del servicio principal de Azure"
-}
-
-variable "client_secret" {
-  description = "Secreto del cliente del servicio principal de Azure"
-}
-
 variable "vnet_name" {
   description = "Nombre de la red virtual"
 }
