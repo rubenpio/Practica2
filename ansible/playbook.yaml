@@ -1,48 +1,113 @@
-- name: Configurar la infra
+- name: Descargar y pusherar las imagenes a nuestro ACR
   hosts: localhost
-  remote_user: ruben
-  become: true
   vars_files:
     - vars.yaml
   tasks:
-    - name: Descargar imagen de nginx con Podman
+    - name: Descargar imagen de wordpress con Podman
       containers.podman.podman_image:
         name: "{{ app1 }}"
         pull: yes
 
-    - name: Descargar imagen de la app con Podman
+    - name: Descargar imagen de apche con Podman
       containers.podman.podman_image:
         name: "{{ app2 }}"
         pull: yes
 
-    - name: Descargar imagen de la app con Podman
+    - name: Descargar imagen de redis con Podman
       containers.podman.podman_image:
         name: "{{ app3 }}"
         pull: yes
 
-    - name: Push de la imagen de nginx hacia nuestro acr
+    - name: Push de la imagen de wordpress hacia nuestro acr
       containers.podman.podman_image:
         name: "{{ image_name1 }}"
         push: true
         username: "{{ acr_username }}"
         password: "{{ acr_password }}"
         push_args:
-         dest: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name1 }}"
+         dest: "{{ acr_name }}.azurecr.io/aks/{{ image_name1 }}"
 
-    - name: Push de la imagen de la app hacia nuestro acr
+    - name: Push de la imagen de apache hacia nuestro acr
       containers.podman.podman_image:
         name: "{{ image_name2 }}"
         push: true
         username: "{{ acr_username }}"
         password: "{{ acr_password }}"
         push_args:
-         dest: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name2 }}"
+         dest: "{{ acr_name }}.azurecr.io/maquina/{{ image_name2 }}"
 
-    - name: Push de la imagen de la app hacia nuestro acr
+    - name: Push de la imagen de redis hacia nuestro acr
       containers.podman.podman_image:
         name: "{{ image_name3 }}"
         push: true
         username: "{{ acr_username }}"
         password: "{{ acr_password }}"
         push_args:
-         dest: "{{ acr_name }}.azurecr.io/caso_practico2/{{ image_name3 }}"
+         dest: "{{ acr_name }}.azurecr.io/aks/{{ image_name3 }}"
+
+- name: Instalar podman en nuestra maquina virtual
+  hosts: Mi_Maquina
+  become: yes
+  remote_user: adminuser
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Instalar paquetes necesarios para Podman
+      apt:
+        name: ["software-properties-common", "apt-transport-https", "gnupg"]
+
+    - name: Agregar la clave GPG de Podman
+      apt_key:
+        url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_22.04/Release.key"
+        state: present
+
+    - name: Agregar el repositorio de Podman
+      apt_repository:
+        repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_22.04/ /"
+        state: present
+
+    - name: Actualizar la lista de paquetes después de agregar el repositorio de Podman
+      apt:
+        update_cache: yes
+
+    - name: Instalar Podman
+      apt:
+        name: podman
+        state: present
+
+- name: Descargamos la imagen del ACR y ejecutamos el contenedor
+  hosts: Mi_Maquina
+  become: yes
+  remote_user: adminuser
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Nos traemos la imagen de apache
+      containers.podman.podman_image:
+        name: "{{ acr_name }}.azurecr.io/maquina/{{ image_name2 }}"
+        pull: yes
+        username: "{{ acr_username }}"
+        password: "{{ acr_password }}"
+
+    - name: Run container
+      containers.podman.podman_container:
+        name: Mi_Contenedor
+        image: "{{ acr_name }}.azurecr.io/maquina/{{ image_name2 }}"
+        state: started
+        ports:
+          - "8080:80"
+
+- name: Desplegar aplicación en AKS
+  hosts: localhost
+  tasks:
+    - name: Crear namespace
+      k8s:
+        name: ruben
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Crear la app
+      k8s:
+        state: present
+        src: aks/app.yaml
