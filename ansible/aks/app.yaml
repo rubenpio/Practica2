@@ -17,7 +17,7 @@ spec:
         "kubernetes.io/os": linux
       containers:
       - name: frontend
-        image: "acrruben.azurecr.io/aks/wordpress:latest"
+        image: "acrruben.azurecr.io/aks/wordpress:CasoPractico2"
         ports:
         - containerPort: 80
 ---
@@ -53,7 +53,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: "acrruben.azurecr.io/aks/redis:6.0.8"
+        image: "acrruben.azurecr.io/aks/CasoPractico2"
         env:
          - name: ALLOW_EMPTY_PASSWORD
            value: "yes"
