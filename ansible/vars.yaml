@@ -8,3 +8,5 @@ app1: docker://wordpress
 app2: docker://httpd
 app3: docker://mcr.microsoft.com/oss/bitnami/redis:6.0.8
 label: CasoPractico2
+aks_name: AKSRuben
+group_name: Grupo_Ruben
