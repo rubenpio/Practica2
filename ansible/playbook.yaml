@@ -117,7 +117,12 @@
 
 - name: Desplegar aplicación en AKS
   hosts: localhost
+  vars_files:
+    - vars.yaml
   tasks:
+    - name: Conseguimos las credenciales de nuestro AKS
+      command: "az aks get-credentials --name {{ aks_name }} --overwrite-existing --resource-group {{ group_name}}"
+
     - name: Crear namespace
       k8s:
         name: ruben
@@ -129,4 +134,3 @@
       k8s:
         state: present
         src: aks/app.yaml
-
