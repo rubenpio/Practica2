@@ -102,7 +102,7 @@
   tasks:
     - name: Nos traemos la imagen de apache
       containers.podman.podman_image:
-        name: "{{ acr_name }}.azurecr.io/maquina/{{ image_name2 }}"
+        name: "{{ acr_name }}.azurecr.io/maquina/{{ image_name2 }}:{{ label }}"
         pull: yes
         username: "{{ acr_username }}"
         password: "{{ acr_password }}"
@@ -110,7 +110,7 @@
     - name: Run container
       containers.podman.podman_container:
         name: Mi_Contenedor
-        image: "{{ acr_name }}.azurecr.io/maquina/{{ image_name2 }}"
+        image: "{{ acr_name }}.azurecr.io/maquina/{{ image_name2 }}:{{ label }}"
         state: started
         ports:
           - "8080:80"
