@@ -18,32 +18,50 @@
         name: "{{ app3 }}"
         pull: yes
 
+    - name: Cambiar etiqueta
+      containers.podman.podman_tag:
+        image: "wordpress"
+        target_names:
+          - "{{ image_name1 }}:{{ label }}"
+
+    - name: Cambiar etiqueta
+      containers.podman.podman_tag:
+        image: "{{ image_name2 }}"
+        target_names:
+          - "{{ image_name2 }}:{{ label }}"
+
+    - name: Cambiar etiqueta
+      containers.podman.podman_tag:
+        image: "{{ image_name3 }}"
+        target_names:
+          - "{{ image_name3 }}:{{ label }}"
+
     - name: Push de la imagen de wordpress hacia nuestro acr
       containers.podman.podman_image:
-        name: "{{ image_name1 }}"
+        name: "{{ image_name1 }}:{{ label }}"
         push: true
         username: "{{ acr_username }}"
         password: "{{ acr_password }}"
         push_args:
-         dest: "{{ acr_name }}.azurecr.io/aks/{{ image_name1 }}"
+         dest: "{{ acr_name }}.azurecr.io/aks/"
 
     - name: Push de la imagen de apache hacia nuestro acr
       containers.podman.podman_image:
-        name: "{{ image_name2 }}"
+        name: "{{ image_name2 }}:{{ label }}"
         push: true
         username: "{{ acr_username }}"
         password: "{{ acr_password }}"
         push_args:
-         dest: "{{ acr_name }}.azurecr.io/maquina/{{ image_name2 }}"
+         dest: "{{ acr_name }}.azurecr.io/maquina/"
 
     - name: Push de la imagen de redis hacia nuestro acr
       containers.podman.podman_image:
-        name: "{{ image_name3 }}"
+        name: "{{ image_name3 }}:{{ label }}"
         push: true
         username: "{{ acr_username }}"
         password: "{{ acr_password }}"
         push_args:
-         dest: "{{ acr_name }}.azurecr.io/aks/{{ image_name3 }}"
+         dest: "{{ acr_name }}.azurecr.io/aks/"
 
 - name: Instalar podman en nuestra maquina virtual
   hosts: Mi_Maquina
@@ -111,3 +129,4 @@
       k8s:
         state: present
         src: aks/app.yaml
+
