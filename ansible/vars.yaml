@@ -1,6 +1,6 @@
 image_name1: wordpress
 image_name2: httpd
-image_name3: redis:6.0.8
+image_name3: redis
 acr_name: acrruben
 acr_username: ACRRuben
 acr_password: 
