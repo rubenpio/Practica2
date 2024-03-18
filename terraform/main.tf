@@ -70,7 +70,7 @@ resource "azurerm_public_ip" "public_ip" {
   name                = var.ip_pub
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"  # Puedes cambiar a "Static" si necesitas una IP pública estática
+  allocation_method   = "Dynamic"
 }
 # Creación de una interfaz de red
 resource "azurerm_network_interface" "interface" {
